@@ -4,6 +4,7 @@ const Schema = mongoose.Schema;
 const serviceTypeSchema = new Schema({
     serviceName: { type: String, required: true },
     iconCode: Number,
+    services: [{ type: Schema.Types.ObjectId, ref: 'Service' }],
   }, {
     timestamps: {
       createdAt: 'created_at',

@@ -22,18 +22,6 @@ const {
           })
     });
 
-
-    router.get('/services', (req, res, next) => {
-        Service.find().populate('serviceType').populate('owner')
-        .then(allTheServices => {
-            res.json(allTheServices);
-          })
-        .catch(err => {
-            res.json(err);
-          })
-        });
-
-
     router.post("/newservice", isLoggedIn(), (req, res, next) => {
         Service.create({
             serviceName: req.body.serviceName,
@@ -45,13 +33,71 @@ const {
             credits: req.body.credits,
             owner: req.session.currentUser._id
           })
-            .then(response => {
-              res.json(response);
+          .then(response => {
+            ServiceType.findByIdAndUpdate(req.body.serviceTypeID, {$push: {services: response._id}})
+            .then(theResponse => {
+                res.json(theResponse);
             })
             .catch(err => {
-              res.json(err);
-            });
+                res.json(err);
+            })
+        })
+        .catch(err => {
+            res.json(err);
         });
+        });
+
+        router.get('/allservices', (req, res, next) => {
+            Service.find().populate('owner').populate('serviceType')
+            .then(allServices => {
+                res.json(allServices);
+              })
+            .catch(err => {
+                res.json(err);
+              })
+        });
+
+        router.get('/searchservices', (req, res, next) => {
+            let query = req.query.serviceName
+            Service.find({ serviceName: { $regex: query, $options: "i" } }).populate('owner').populate('serviceType')
+            .then(response => {
+                res.json(response);
+              })
+            .catch(err => {
+                res.json(err);
+              })
+        });
+
+        router.get('/services/:categoryID', (req, res, next)=>{
+            if(!mongoose.Types.ObjectId.isValid(req.params.categoryID)){
+            res.status(400).json({message: 'Specified id is not valid'});
+            return;
+            }
     
+            ServiceType.findById(req.params.categoryID).populate('services')
+            .then(response => {
+                res.status(200).json(response);
+            })
+            .catch(err => {
+                res.json(err);
+            })  
+        })
+
+        router.get('/services/:categoryID/:serviceID', isLoggedIn(), (req, res, next)=>{
+            if(!mongoose.Types.ObjectId.isValid(req.params.serviceID)){
+            res.status(400).json({message: 'Specified id is not valid'});
+            return;
+            }
+    
+            Service.findById(req.params.serviceID).populate('servicesType')
+            .then(response => {
+                res.status(200).json(response);
+            })
+            .catch(err => {
+                res.json(err);
+            })  
+        })
+
+        
 
 module.exports = router;

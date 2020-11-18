@@ -3,7 +3,7 @@ const Schema = mongoose.Schema;
 
 const serviceTypeSchema = new Schema({
     serviceName: { type: String, required: true },
-    iconCode: { type: icon },
+    iconCode: Number,
   }, {
     timestamps: {
       createdAt: 'created_at',

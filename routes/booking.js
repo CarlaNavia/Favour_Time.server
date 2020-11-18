@@ -12,52 +12,85 @@ const {
   validationLoggin,
 } = require("../helpers/middlewares");
 
+//Ruta GET de bookings (client === user._id)
+router.get("/bookings/:userID", (req, res, next) => {
+  if (!mongoose.Types.ObjectId.isValid(req.params.userID)) {
+    res.status(400).json({ message: "Specified id is not valid" });
+    return;
+  }
+  //console.log(req.params.userID, "req.params.userid")
+  Booking.find({ client: req.params.userID })
+    .populate("client")
+    .populate("owner")
+    .populate("service")
+    .then((response) => {
+      console.log(response, "response");
+      //console.log(response.client._id, "RESPONSE")
+      //   if (!response.client.equals(req.session.currentUser._id)) {
+      //     res.status(400).json({
+      //       message: "Unfortunately you do not have any booking list",
+      //     });
 
-//rutas get
+      res.json(response);
+    })
 
-//aceptar/declinar
+    //   Service.findById(req.params.userID).then(
+    //     (response) => {
+    //       res.json( response);
+    //     }
+    //   );
+    // })
 
-router.post("/booking/:serviceID", isLoggedIn(), (req, res, next) => {
+    .catch((err) => {
+      res.json(err);
+    });
+});
+
+//
+//Ruta por POST para reservar un servicio
+router.post("/bookings/:serviceID", isLoggedIn(), (req, res, next) => {
   if (!mongoose.Types.ObjectId.isValid(req.params.serviceID)) {
     res.status(400).json({ message: "Specified id is not valid" });
     return;
   }
   Service.findById(req.params.serviceID)
-  .then((response) => {
-    if (response.owner.equals(req.session.currentUser._id)) {
-      res.status(400).json({
-        message: "You are not allowed due to you are the owner of the service.",
-      });
-      return;
-    }
-    Booking.create({
-      date: req.body.date,
-      time: req.body.time,
-      client: req.session.currentUser._id,
-      owner: req.body.owner,
-      status: req.body.status,
-      service: req.body.service,
-    })
-
-      .then((response) => {
-        Service.findByIdAndUpdate(req.body.service, { $push: { bookings: response._id }})
-          .then((theResponse) => {
-            res.json(theResponse);
-            console.log(theResponse, "THERESPONSEEEEEEE")
-          })
-          .catch((err) => {
-            res.json(err);
-          });
-          res.json(response)
+    .then((response) => {
+      if (response.owner.equals(req.session.currentUser._id)) {
+        res.status(400).json({
+          message:
+            "You are not allowed due to you are the owner of the service.",
+        });
+        return;
+      }
+      Booking.create({
+        date: req.body.date,
+        time: req.body.time,
+        client: req.session.currentUser._id,
+        owner: response.owner,
+        status: req.body.status,
+        service: req.body.service,
       })
-      .catch((err) => {
-        res.json(err);
-      });
-  })
-  .catch((err) => {
-    res.json(err);
-  });
+
+        .then((response) => {
+          Service.findByIdAndUpdate(req.body.service, {
+            $push: { bookings: response._id },
+          })
+            .then((theResponse) => {
+              res.json(theResponse);
+              console.log(theResponse, "THERESPONSEEEEEEE");
+            })
+            .catch((err) => {
+              res.json(err);
+            });
+          res.json(response);
+        })
+        .catch((err) => {
+          res.json(err);
+        });
+    })
+    .catch((err) => {
+      res.json(err);
+    });
 });
 
 module.exports = router;
-

@@ -84,7 +84,6 @@ router.put("/services/:id", isLoggedIn(), (req, res, next) => {
     res.status(400).json({ message: "Specified id is not valid" });
     return;
   }
-
   Service.findById(req.params.id)
     .then((response) => {
       if (!response.owner.equals(req.session.currentUser._id)) {
@@ -144,8 +143,11 @@ router.delete("/services/:id", isLoggedIn(), (req, res, next) => {
       return;
     }
     Service.findById(req.params.id)
+    //console.log(req.params.id, "SERVICE PARAMS ID")
       .then((response) => {
+        //console.log("RESPONSE SERVICE", service)
         if (!response.owner.equals(req.session.currentUser._id)) {
+          //console.log(response.owner, "OWNER")
           res
             .status(400)
             .json({

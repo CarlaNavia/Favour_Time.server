@@ -13,7 +13,7 @@ const cors = require("cors");
 const auth = require("./routes/auth");
 const service = require("./routes/service")
 const servicetype = require("./routes/servicetype")
-//const booking = require("./routes/booking")
+const booking = require("./routes/booking")
 // const review = require("./routes/review")
 // const user = require("./routes/user")
 
@@ -72,7 +72,7 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use("/auth", auth);
 app.use("/", service);
 app.use("/", servicetype);
-//app.use("/", booking);
+app.use("/", booking);
 // app.use("/", review);
 // app.use("/", user);
 

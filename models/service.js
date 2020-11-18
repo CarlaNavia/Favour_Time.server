@@ -10,6 +10,7 @@ const serviceSchema = new Schema({
     addressToBeHeld: { type: String, required: true  },
     credits: { type: Number, required: true },
     owner: { type: Schema.Types.ObjectId, ref: 'User' },
+    bookings:[{ type: Schema.Types.ObjectId, ref: 'Booking' }],
   }, {
     timestamps: {
       createdAt: 'created_at',

@@ -33,6 +33,7 @@ router.post("/newservice", isLoggedIn(), (req, res, next) => {
     addressToBeHeld: req.body.addressToBeHeld,
     credits: req.body.credits,
     owner: req.session.currentUser._id,
+    bookings: [],
   })
     .then((response) => {
       ServiceType.findByIdAndUpdate(req.body.serviceTypeID, {
@@ -137,7 +138,6 @@ router.get("/services/:serviceID", isLoggedIn(), (req, res, next) => {
 });
 
 //Ruta eliminar servicio
-
 router.delete("/services/:id", isLoggedIn(), (req, res, next) => {
     if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
       res.status(400).json({ message: "Specified id is not valid" });

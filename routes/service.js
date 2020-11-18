@@ -12,15 +12,6 @@ const {
   validationLoggin,
 } = require("../helpers/middlewares");
 
-// router.get('/servicetype', (req, res, next) => {
-//     ServiceType.find()
-//     .then(allServiceTypes => {
-//         res.json(allServiceTypes);
-//       })
-//     .catch(err => {
-//         res.json(err);
-//       })
-// });
 
 //Ruta para crear un nuevo servicio
 router.post("/newservice", isLoggedIn(), (req, res, next) => {
@@ -35,12 +26,12 @@ router.post("/newservice", isLoggedIn(), (req, res, next) => {
     owner: req.session.currentUser._id,
     bookings: [],
   })
-    .then((response) => {
+    .then((newService) => {
       ServiceType.findByIdAndUpdate(req.body.serviceTypeID, {
-        $push: { services: response._id },
+        $push: { services: newService._id },
       })
-        .then((theResponse) => {
-          res.json(theResponse);
+        .then(() => {
+          res.json(newService);
         })
         .catch((err) => {
           res.json(err);
@@ -70,8 +61,8 @@ router.get("/searchservices", (req, res, next) => {
   Service.find({ serviceName: { $regex: query, $options: "i" } })
     .populate("owner")
     .populate("serviceType")
-    .then((response) => {
-      res.json(response);
+    .then((searchedByText) => {
+      res.json(searchedByText);
     })
     .catch((err) => {
       res.json(err);
@@ -85,8 +76,8 @@ router.put("/services/:id", isLoggedIn(), (req, res, next) => {
     return;
   }
   Service.findById(req.params.id)
-    .then((response) => {
-      if (!response.owner.equals(req.session.currentUser._id)) {
+    .then((oneService) => {
+      if (!oneService.owner.equals(req.session.currentUser._id)) {
         res
           .status(400)
           .json({
@@ -94,9 +85,10 @@ router.put("/services/:id", isLoggedIn(), (req, res, next) => {
           });
         return;
       }
-      Service.findByIdAndUpdate(req.params.id, req.body, { new: true }).then(
-        (response) => {
-          res.json(response);
+      Service.findByIdAndUpdate(req.params.id, req.body, { new: true })
+      .then(
+        (theService) => {
+          res.json(theService);
         }
       );
     })
@@ -105,20 +97,6 @@ router.put("/services/:id", isLoggedIn(), (req, res, next) => {
     });
 });
 
-// router.get('/services/:categoryID', (req, res, next)=>{
-//     if(!mongoose.Types.ObjectId.isValid(req.params.categoryID)){
-//     res.status(400).json({message: 'Specified id is not valid'});
-//     return;
-//     }
-
-//     ServiceType.findById(req.params.categoryID).populate('services')
-//     .then(response => {
-//         res.status(200).json(response);
-//     })
-//     .catch(err => {
-//         res.json(err);
-//     })
-// })
 
 //Ruta detalle del servicio
 router.get("/services/:serviceID", isLoggedIn(), (req, res, next) => {
@@ -128,8 +106,8 @@ router.get("/services/:serviceID", isLoggedIn(), (req, res, next) => {
   }
   Service.findById(req.params.serviceID)
     .populate("servicesType")
-    .then((response) => {
-      res.status(200).json(response);
+    .then((serviceDetails) => {
+      res.status(200).json(serviceDetails);
     })
     .catch((err) => {
       res.json(err);
@@ -143,11 +121,8 @@ router.delete("/services/:id", isLoggedIn(), (req, res, next) => {
       return;
     }
     Service.findById(req.params.id)
-    //console.log(req.params.id, "SERVICE PARAMS ID")
-      .then((response) => {
-        //console.log("RESPONSE SERVICE", service)
-        if (!response.owner.equals(req.session.currentUser._id)) {
-          //console.log(response.owner, "OWNER")
+      .then((oneService) => {
+        if (!oneService.owner.equals(req.session.currentUser._id)) {
           res
             .status(400)
             .json({
@@ -155,8 +130,8 @@ router.delete("/services/:id", isLoggedIn(), (req, res, next) => {
             });
           return;
         }
-        Service.findByIdAndRemove(req.params.id).then(
-          (response) => {
+        Service.findByIdAndRemove(req.params.id)
+        .then(() => {
             res.json({message: `Service with ${req.params.id} is deleted successfully.`});
           }
         );

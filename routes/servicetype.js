@@ -14,6 +14,7 @@ router.get("/servicetype", (req, res, next) => {
     });
 });
 
+//Ruta GET buscador por categoría
 router.get("/servicetype/:categoryID", (req, res, next) => {
   if (!mongoose.Types.ObjectId.isValid(req.params.categoryID)) {
     res.status(400).json({ message: "Specified id is not valid" });
@@ -22,8 +23,8 @@ router.get("/servicetype/:categoryID", (req, res, next) => {
 
   ServiceType.findById(req.params.categoryID)
     .populate("services")
-    .then((response) => {
-      res.status(200).json(response);
+    .then((serviceTypeResponse) => {
+      res.status(200).json(serviceTypeResponse);
     })
     .catch((err) => {
       res.json(err);

@@ -18,29 +18,13 @@ router.get("/bookings/:userID", (req, res, next) => {
     res.status(400).json({ message: "Specified id is not valid" });
     return;
   }
-  //console.log(req.params.userID, "req.params.userid")
   Booking.find({ client: req.params.userID })
     .populate("client")
     .populate("owner")
     .populate("service")
-    .then((response) => {
-      console.log(response, "response");
-      //console.log(response.client._id, "RESPONSE")
-      //   if (!response.client.equals(req.session.currentUser._id)) {
-      //     res.status(400).json({
-      //       message: "Unfortunately you do not have any booking list",
-      //     });
-
-      res.json(response);
+    .then((bookingsOfClient) => {
+      res.json(bookingsOfClient);
     })
-
-    //   Service.findById(req.params.userID).then(
-    //     (response) => {
-    //       res.json( response);
-    //     }
-    //   );
-    // })
-
     .catch((err) => {
       res.json(err);
     });
@@ -54,8 +38,8 @@ router.post("/bookings/:serviceID", isLoggedIn(), (req, res, next) => {
     return;
   }
   Service.findById(req.params.serviceID)
-    .then((response) => {
-      if (response.owner.equals(req.session.currentUser._id)) {
+    .then((currentService) => {
+      if (currentService.owner.equals(req.session.currentUser._id)) {
         res.status(400).json({
           message:
             "You are not allowed due to you are the owner of the service.",
@@ -66,23 +50,20 @@ router.post("/bookings/:serviceID", isLoggedIn(), (req, res, next) => {
         date: req.body.date,
         time: req.body.time,
         client: req.session.currentUser._id,
-        owner: response.owner,
-        status: req.body.status,
-        service: req.body.service,
+        owner: currentService.owner,
+        service: req.params.serviceID
       })
 
-        .then((response) => {
-          Service.findByIdAndUpdate(req.body.service, {
-            $push: { bookings: response._id },
+        .then((newBooking) => {
+          Service.findByIdAndUpdate(req.params.serviceID, {
+            $push: { bookings: newBooking._id },
           })
-            .then((theResponse) => {
-              res.json(theResponse);
-              console.log(theResponse, "THERESPONSEEEEEEE");
+            .then(() => {
+                res.json(newBooking);
             })
             .catch((err) => {
               res.json(err);
             });
-          res.json(response);
         })
         .catch((err) => {
           res.json(err);

@@ -20,7 +20,6 @@ router.get("/servicetype/:categoryID", (req, res, next) => {
     res.status(400).json({ message: "Specified id is not valid" });
     return;
   }
-
   ServiceType.findById(req.params.categoryID)
     .populate("services")
     .then((serviceTypeResponse) => {

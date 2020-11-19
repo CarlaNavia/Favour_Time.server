@@ -5,13 +5,7 @@ const router = express.Router();
 const ServiceType = require("../models/ServiceType");
 const Service = require("../models/Service");
 
-// HELPER FUNCTIONS
-const {
-  isLoggedIn,
-  isNotLoggedIn,
-  validationLoggin,
-} = require("../helpers/middlewares");
-
+const { isLoggedIn } = require("../helpers/middlewares");
 
 //Ruta para crear un nuevo servicio
 router.post("/newservice", isLoggedIn(), (req, res, next) => {

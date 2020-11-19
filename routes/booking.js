@@ -6,12 +6,7 @@ const Booking = require("../models/Booking");
 const Service = require("../models/Service");
 const User = require("../models/User");
 
-// HELPER FUNCTIONS
-const {
-  isLoggedIn,
-  isNotLoggedIn,
-  validationLoggin,
-} = require("../helpers/middlewares");
+const { isLoggedIn } = require("../helpers/middlewares");
 
 //Ruta GET de bookings (client === user._id)   PROFILE 1
 router.get("/clientbooking/:userID", isLoggedIn(),(req, res, next) => {
@@ -19,9 +14,6 @@ router.get("/clientbooking/:userID", isLoggedIn(),(req, res, next) => {
     res.status(400).json({ message: "Specified id is not valid" });
     return;
   }
-  // console.log(req.session.currentUser._id , 'CurrentUser')
-  // console.log(req.params.userID , 'userId params')
-
   if (req.session.currentUser._id !== req.params.userID) {
     res.status(400).json({
       message:
@@ -40,16 +32,12 @@ router.get("/clientbooking/:userID", isLoggedIn(),(req, res, next) => {
       res.json(err);
     });
 });
-
 //Ruta GET de bookings (currentUser === ownerService) PROFILE 2
 router.get("/ownerservice/:userID", isLoggedIn(), (req, res, next) => {
   if (!mongoose.Types.ObjectId.isValid(req.params.userID)) {
     res.status(400).json({ message: "Specified id is not valid" });
     return;
   }
-  // console.log(req.session.currentUser._id , 'CurrentUser')
-  // console.log(req.params.userID , 'userId params')
-
   if (req.session.currentUser._id !== req.params.userID) {
     res.status(400).json({
       message:
@@ -68,8 +56,6 @@ router.get("/ownerservice/:userID", isLoggedIn(), (req, res, next) => {
       res.json(err);
     });
 });
-
-
 //Ruta por POST para reservar un servicio
 router.post("/bookings/:serviceID", isLoggedIn(), (req, res, next) => {
   if (!mongoose.Types.ObjectId.isValid(req.params.serviceID)) {
@@ -88,11 +74,11 @@ router.post("/bookings/:serviceID", isLoggedIn(), (req, res, next) => {
       Booking.create({
         date: req.body.date,
         time: req.body.time,
+        extraInformation: req.body.extraInformation,
         clientBooking: req.session.currentUser._id,
         ownerService: currentService.owner,
         service: req.params.serviceID
       })
-
         .then((newBooking) => {
           Service.findByIdAndUpdate(req.params.serviceID, {
             $push: { bookings: newBooking._id },
@@ -112,18 +98,12 @@ router.post("/bookings/:serviceID", isLoggedIn(), (req, res, next) => {
       res.json(err);
     });
 });
-
 // Ruta por POST para cambiar el estado del booking 
 router.put("/bookings/:ownerServiceID/:clientBooking/:bookingId/:status", isLoggedIn(), (req, res, next) => {
   if (!mongoose.Types.ObjectId.isValid(req.params.bookingId)) {
     res.status(400).json({ message: "Specified id is not valid" });
     return;
   }
-  // console.log(req.session.currentUser._id , 'CurrentUser')
-  // console.log(req.params.ownerServiceID , 'id params')
-  // console.log(req.params.bookingId , 'bookingId')
-  // console.log(req.params.clientBooking, 'client')
-
   if (req.session.currentUser._id !== req.params.ownerServiceID) {
     res.status(400).json({
       message:
@@ -142,9 +122,8 @@ router.put("/bookings/:ownerServiceID/:clientBooking/:bookingId/:status", isLogg
               User.findByIdAndUpdate( req.session.currentUser._id, {$inc : {credits : responseCredits.credits}}, {new: true})
               .then(responseOwner =>{
                 User.findByIdAndUpdate( req.params.clientBooking, {$inc : {credits : -responseCredits.credits}}, {new: true})
-                .then(response =>{
-                  console.log(response, 'response')
-                  res.json(responseOwner)
+                .then(responseClient =>{
+                  res.json(response)
                 })
               })
               .catch(error =>{
@@ -163,6 +142,5 @@ router.put("/bookings/:ownerServiceID/:clientBooking/:bookingId/:status", isLogg
       res.json(err);
     });
 });
-
 
 module.exports = router;

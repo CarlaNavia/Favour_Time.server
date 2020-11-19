@@ -65,6 +65,7 @@ router.post("/bookings/:serviceID", isLoggedIn(), (req, res, next) => {
         });
         return;
       }
+     
       Booking.create({
         date: req.body.date,
         time: req.body.time,
@@ -93,7 +94,7 @@ router.post("/bookings/:serviceID", isLoggedIn(), (req, res, next) => {
     });
 });
 
-// Ruta por POST para cambiar el estado del booking 
+// Ruta por PUT para cambiar el estado del booking 
 router.put("/bookings/:id/:status", isLoggedIn(), (req, res, next) => {
   if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
     res.status(400).json({ message: "Specified id is not valid" });
@@ -115,15 +116,9 @@ router.put("/bookings/:id/:status", isLoggedIn(), (req, res, next) => {
           .populate("clientBooking")
           .populate("ownerService")
           .then(response =>{
-            Service.findById(response.service._id)
-            .then(responseCredits =>{
-              User.findByIdAndUpdate( req.session.currentUser._id, {$inc : {credits : responseCredits.credits}}, {new: true})
-              .then(response =>{
-                console.log(response, '???')
-              })
-
-            })
-            res.json(response)
+              User.findByIdAndUpdate( response.ownerService._id, {$inc : {credits : response.service.credits}}, {new: true})
+              User.findByIdAndUpdate( response.clientBooking._id, {$inc : {credits : -response.service.credits}}, {new: true})
+           res.json(response)
           })
         }else{
           Booking.findByIdAndUpdate(req.params.id ,{status: "declined"} , {new: true})

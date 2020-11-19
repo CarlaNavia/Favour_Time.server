@@ -1,0 +1,72 @@
+{
+	"info": {
+		"_postman_id": "75e2732e-4a25-426e-9f58-02deb30dd445",
+		"name": "BOOKING",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "CREATE/booking",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "date",
+							"value": "2020/11/22",
+							"type": "text"
+						},
+						{
+							"key": "time",
+							"value": "11:00",
+							"type": "text"
+						},
+						{
+							"key": "client",
+							"value": "5fb52ecf8e51024629661b23",
+							"type": "text"
+						},
+						{
+							"key": "owner",
+							"value": "5fb536c5c172514c1371cf40",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "service",
+							"value": "5fb54c92c6b39e590cf22c71",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://localhost:4000/bookings/5fb54c92c6b39e590cf22c71",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "4000",
+					"path": [
+						"bookings",
+						"5fb54c92c6b39e590cf22c71"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/bookings/:id",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": ""
+				}
+			},
+			"response": []
+		}
+	],
+	"protocolProfileBehavior": {}
+}

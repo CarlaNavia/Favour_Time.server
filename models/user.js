@@ -9,6 +9,7 @@ const userSchema = new Schema({
     password: { type: String, required: true},
     imageProfile: { type: String, default: "..." },
     review: [{ type: Schema.Types.ObjectId, ref: "Review" }],
+    
   }, {
     timestamps: {
       createdAt: 'created_at',

@@ -3,11 +3,11 @@ const Schema = mongoose.Schema;
 
 const bookingSchema = new Schema({
     date: { type: Date, required: true},
-    time: { type: Time, required: true},
-    client: { type: Schema.Types.ObjectId, ref: User },
-    owner: { type: Schema.Types.ObjectId, ref: User },
-    service: { type: Schema.Types.ObjectId, ref: Service },
-    status: { pending, accepted, declined },
+    time: { type: String, required: true},
+    client: { type: Schema.Types.ObjectId, ref: "User" },
+    owner: { type: Schema.Types.ObjectId, ref: "User" },
+    service: { type: Schema.Types.ObjectId, ref: "Service" },
+    status: { type: String , default: "pending", enum: ['accepted', 'declined', 'pending']},
   }, {
     timestamps: {
       createdAt: 'created_at',

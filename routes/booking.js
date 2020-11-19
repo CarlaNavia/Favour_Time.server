@@ -12,15 +12,15 @@ const {
   validationLoggin,
 } = require("../helpers/middlewares");
 
-//Ruta GET de bookings (client === user._id)
-router.get("/bookings/:userID", (req, res, next) => {
+//Ruta GET de bookings (client === user._id)   PROFILE 1
+router.get("/clientbooking/:userID", (req, res, next) => {
   if (!mongoose.Types.ObjectId.isValid(req.params.userID)) {
     res.status(400).json({ message: "Specified id is not valid" });
     return;
   }
-  Booking.find({ client: req.params.userID })
-    .populate("client")
-    .populate("owner")
+  Booking.find({ clientBooking: req.params.userID })
+    .populate("clientBooking")
+    .populate("ownerService")
     .populate("service")
     .then((bookingsOfClient) => {
       res.json(bookingsOfClient);
@@ -30,7 +30,25 @@ router.get("/bookings/:userID", (req, res, next) => {
     });
 });
 
-//
+//Ruta GET de bookings (currentUser === ownerService) PROFILE 2
+router.get("/ownerservice/:userID", (req, res, next) => {
+  if (!mongoose.Types.ObjectId.isValid(req.params.userID)) {
+    res.status(400).json({ message: "Specified id is not valid" });
+    return;
+  }
+  Booking.find({ ownerService: req.params.userID })
+    .populate("clientBooking")
+    .populate("ownerService")
+    .populate("service")
+    .then((bookingsOfClient) => {
+      res.json(bookingsOfClient);
+    })
+    .catch((err) => {
+      res.json(err);
+    });
+});
+
+
 //Ruta por POST para reservar un servicio
 router.post("/bookings/:serviceID", isLoggedIn(), (req, res, next) => {
   if (!mongoose.Types.ObjectId.isValid(req.params.serviceID)) {
@@ -49,8 +67,8 @@ router.post("/bookings/:serviceID", isLoggedIn(), (req, res, next) => {
       Booking.create({
         date: req.body.date,
         time: req.body.time,
-        client: req.session.currentUser._id,
-        owner: currentService.owner,
+        clientBooking: req.session.currentUser._id,
+        ownerService: currentService.owner,
         service: req.params.serviceID
       })
 
@@ -73,5 +91,6 @@ router.post("/bookings/:serviceID", isLoggedIn(), (req, res, next) => {
       res.json(err);
     });
 });
+
 
 module.exports = router;

@@ -14,9 +14,19 @@ const {
 } = require("../helpers/middlewares");
 
 //Ruta GET de bookings (client === user._id)   PROFILE 1
-router.get("/clientbooking/:userID", (req, res, next) => {
+router.get("/clientbooking/:userID", isLoggedIn(),(req, res, next) => {
   if (!mongoose.Types.ObjectId.isValid(req.params.userID)) {
     res.status(400).json({ message: "Specified id is not valid" });
+    return;
+  }
+  // console.log(req.session.currentUser._id , 'CurrentUser')
+  // console.log(req.params.userID , 'userId params')
+
+  if (req.session.currentUser._id !== req.params.userID) {
+    res.status(400).json({
+      message:
+        "You are not allowed due to you are the owner of the service.",
+    });
     return;
   }
   Booking.find({ clientBooking: req.params.userID })
@@ -32,9 +42,19 @@ router.get("/clientbooking/:userID", (req, res, next) => {
 });
 
 //Ruta GET de bookings (currentUser === ownerService) PROFILE 2
-router.get("/ownerservice/:userID", (req, res, next) => {
+router.get("/ownerservice/:userID", isLoggedIn(), (req, res, next) => {
   if (!mongoose.Types.ObjectId.isValid(req.params.userID)) {
     res.status(400).json({ message: "Specified id is not valid" });
+    return;
+  }
+  // console.log(req.session.currentUser._id , 'CurrentUser')
+  // console.log(req.params.userID , 'userId params')
+
+  if (req.session.currentUser._id !== req.params.userID) {
+    res.status(400).json({
+      message:
+        "You are not allowed due to you are the owner of the service.",
+    });
     return;
   }
   Booking.find({ ownerService: req.params.userID })
@@ -94,44 +114,50 @@ router.post("/bookings/:serviceID", isLoggedIn(), (req, res, next) => {
 });
 
 // Ruta por POST para cambiar el estado del booking 
-router.put("/bookings/:id/:status", isLoggedIn(), (req, res, next) => {
-  if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+router.put("/bookings/:ownerServiceID/:clientBooking/:bookingId/:status", isLoggedIn(), (req, res, next) => {
+  if (!mongoose.Types.ObjectId.isValid(req.params.bookingId)) {
     res.status(400).json({ message: "Specified id is not valid" });
     return;
   }
+  // console.log(req.session.currentUser._id , 'CurrentUser')
+  // console.log(req.params.ownerServiceID , 'id params')
+  // console.log(req.params.bookingId , 'bookingId')
+  // console.log(req.params.clientBooking, 'client')
+
+  if (req.session.currentUser._id !== req.params.ownerServiceID) {
+    res.status(400).json({
+      message:
+        "You are not allowed due to you are the owner of the service.",
+    });
+    return;
+  }
   
-  Booking.findById(req.params.id)
+  Booking.findById(req.params.bookingId)
     .then((currentBooking) => {
-      if (currentBooking.ownerService.equals(req.session.currentUser._id)) {
-        res.status(400).json({
-          message:
-            "You are not allowed due to you are the owner of the service.",
-        });
-        return;
-      }else{
         if(req.params.status === "accepted"){
-          Booking.findByIdAndUpdate(req.params.id ,{status: "accepted"} , {new: true})
-          .populate("service")
-          .populate("clientBooking")
-          .populate("ownerService")
+          Booking.findByIdAndUpdate(req.params.bookingId ,{status: "accepted"} , {new: true})
           .then(response =>{
             Service.findById(response.service._id)
             .then(responseCredits =>{
               User.findByIdAndUpdate( req.session.currentUser._id, {$inc : {credits : responseCredits.credits}}, {new: true})
-              .then(response =>{
-                console.log(response, '???')
+              .then(responseOwner =>{
+                User.findByIdAndUpdate( req.params.clientBooking, {$inc : {credits : -responseCredits.credits}}, {new: true})
+                .then(response =>{
+                  console.log(response, 'response')
+                  res.json(responseOwner)
+                })
               })
-
+              .catch(error =>{
+                res.json(error)
+              })
             })
-            res.json(response)
           })
         }else{
-          Booking.findByIdAndUpdate(req.params.id ,{status: "declined"} , {new: true})
+          Booking.findByIdAndUpdate(req.params.bookingId ,{status: "declined"} , {new: true})
           .then(response =>{
           res.json(response)
           })
         }
-      }
     }) 
     .catch((err) => {
       res.json(err);

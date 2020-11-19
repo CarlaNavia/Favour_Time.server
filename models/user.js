@@ -9,7 +9,15 @@ const userSchema = new Schema({
     password: { type: String, required: true},
     imageProfile: { type: String, default: "..." },
     review: [{ type: Schema.Types.ObjectId, ref: "Review" }],
-    
+    dateOfBirth: {type: Date ,  default: "2000/01/01"},
+    phoneNumber: {type: Number, default: 0},
+    address: {
+      streetName: {type:String, default: "C/"},
+      streetNumber: {type:Number , default: 99},
+      zipCode:{type:Number , default: 00000},
+      city:{type:String, default: "---"},
+      country: {type:String , default: "---"},
+    }
   }, {
     timestamps: {
       createdAt: 'created_at',
@@ -20,3 +28,5 @@ const userSchema = new Schema({
 const User = mongoose.model('User', userSchema);
 
 module.exports = User;
+
+

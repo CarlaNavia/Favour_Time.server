@@ -108,6 +108,31 @@ router.get("/services/:serviceID", isLoggedIn(), (req, res, next) => {
     });
 });
 
+//Ruta GET de servicios para el owner
+router.get("/servicesOwner/:userID", isLoggedIn(),(req, res, next) => {
+  if (!mongoose.Types.ObjectId.isValid(req.params.userID)) {
+    res.status(400).json({ message: "Specified id is not valid" });
+    return;
+  }
+  if (req.session.currentUser._id !== req.params.userID) {
+    res.status(400).json({
+      message:
+        "You are not allowed due to you are the owner of the service.",
+    });
+    return;
+  }
+  Service.find({ owner: req.params.userID })
+    .populate("clientBooking")
+    .populate("ownerService")
+    .populate("service")
+    .then((serviceOfClient) => {
+      res.json(serviceOfClient);
+    })
+    .catch((err) => {
+      res.json(err);
+    });
+});
+
 //Ruta eliminar servicio
 router.delete("/services/:id", isLoggedIn(), (req, res, next) => {
     if (!mongoose.Types.ObjectId.isValid(req.params.id)) {

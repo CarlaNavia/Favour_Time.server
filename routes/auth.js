@@ -4,6 +4,7 @@ const createError = require("http-errors");
 const bcrypt = require("bcrypt");
 const saltRounds = 10;
 const User = require("../models/User");
+const mongoose = require('mongoose');
 
 // HELPER FUNCTIONS
 const {
@@ -92,6 +93,38 @@ router.get("/profile", isLoggedIn() , (req, res, next) => {
 });
 
 
+// Editar informacion personal del user
+router.put("/profile/:userID", isLoggedIn(), (req, res, next) => {
+  if (!mongoose.Types.ObjectId.isValid(req.params.userID)) {
+    res.status(400).json({ message: "Specified id is not valid" });
+    return;
+  }
+  console.log(req.params.userID, 'params')
+  User.findById(req.params.userID)
+    .then((user) => {
+      if (!user._id.equals(req.session.currentUser._id)) {
+        res
+          .status(400)
+          .json({
+            message: "You are not the owner, you cannot edit this profile",
+          });
+        return;
+      }
+      User.findByIdAndUpdate(req.params.userID, req.body, { new: true })
+      .then(
+        (userUpdated) => {
+          console.log(userUpdated, 'userUpdated')
+          res.json(userUpdated);
+        }
+      );
+    })
+    .catch((err) => {
+      res.json(err);
+    });
+});
+
+  
+  
 
 
 module.exports = router;

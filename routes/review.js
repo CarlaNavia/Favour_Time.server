@@ -14,24 +14,22 @@ const {
 
 //Ruta GET de reviews (currentUser === ownerService) PROFILE 2
 router.get("/reviews/:userID", isLoggedIn(), (req, res, next) => {
-    if (!mongoose.Types.ObjectId.isValid(req.params.userID)) {
-      res.status(400).json({ message: "Specified id is not valid" });
-      return;
-    }
-    Review.find({ user: req.params.userID })
-      .populate("booking")
-      .populate("author")
-      .populate("user")
-      .populate("service")
-      .then((reviewsOfOwnerService) => {
-          console.log(reviewsOfOwnerService, "REVIEWSOFOWNER")
-          console.log(req.params.userID, "REQPARAMS")
-        res.json(reviewsOfOwnerService);
-      })
-      .catch((err) => {
-        res.json(err);
-      });
-  });
+  if (!mongoose.Types.ObjectId.isValid(req.params.userID)) {
+    res.status(400).json({ message: "Specified id is not valid" });
+    return;
+  }
+  Review.find({ user: req.params.userID })
+    .populate("booking")
+    .populate("author")
+    .populate("user")
+    .populate("service")
+    .then((reviewsOfOwnerService) => {
+      res.json(reviewsOfOwnerService);
+    })
+    .catch((err) => {
+      res.json(err);
+    });
+});
 
 //Ruta por POST para crear una review a un owner
 router.post("/reviews/:bookingID", isLoggedIn(), (req, res, next) => {
@@ -39,6 +37,7 @@ router.post("/reviews/:bookingID", isLoggedIn(), (req, res, next) => {
     res.status(400).json({ message: "Specified id is not valid" });
     return;
   }
+
   Booking.findById(req.params.bookingID)
     .then((currentBooking) => {
       if (!currentBooking.clientBooking.equals(req.session.currentUser._id)) {
@@ -48,28 +47,35 @@ router.post("/reviews/:bookingID", isLoggedIn(), (req, res, next) => {
         });
         return;
       }
-      Review.create({
-        booking: req.params.bookingID,
-        author: currentBooking.clientBooking,
-        user: currentBooking.ownerService,
-        service: req.body.service,
-        description: req.body.description,
-        rating: req.body.rating,
-      })
-        .then((newReview) => {
-          User.findByIdAndUpdate(currentBooking.ownerService, {
-            $push: { review: newReview._id },
-          })
-            .then(() => {
-              res.json(newReview);
-            })
-            .catch((err) => {
-              res.json(err);
-            });
+      if (currentBooking.status === "accepted") {
+        Review.create({
+          booking: req.params.bookingID,
+          author: currentBooking.clientBooking,
+          user: currentBooking.ownerService,
+          service: req.body.service,
+          description: req.body.description,
+          rating: req.body.rating,
         })
-        .catch((err) => {
-          res.json(err);
-        });
+          .then((newReview) => {
+            User.findByIdAndUpdate(currentBooking.ownerService, {
+              $push: { review: newReview._id },
+            })
+              .then(() => {
+                res.json(newReview);
+              })
+              .catch((err) => {
+                res.json(err);
+              });
+          })
+          .catch((err) => {
+            res.json(err);
+          });
+      } else {
+        res.status(400).json({
+            message:
+              "You cannot write a review until your booking will be accepted.",
+          });
+      }
     })
     .catch((err) => {
       res.json(err);

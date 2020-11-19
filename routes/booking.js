@@ -13,7 +13,7 @@ const {
 } = require("../helpers/middlewares");
 
 //Ruta GET de bookings (client === user._id)
-router.get("/bookings/:userID", (req, res, next) => {
+router.get("/bookings/:userID", isLoggedIn(), (req, res, next) => {
   if (!mongoose.Types.ObjectId.isValid(req.params.userID)) {
     res.status(400).json({ message: "Specified id is not valid" });
     return;

@@ -9,6 +9,7 @@ const bookingSchema = new Schema({
     ownerService: { type: Schema.Types.ObjectId, ref: "User" },
     service: { type: Schema.Types.ObjectId, ref: "Service" },
     status: { type: String , default: "pending", enum: ['accepted', 'declined', 'pending']},
+    
   }, {
     timestamps: {
       createdAt: 'created_at',

@@ -71,6 +71,7 @@ router.post("/bookings/:serviceID", isLoggedIn(), (req, res, next) => {
         });
         return;
       }
+     
       Booking.create({
         date: req.body.date,
         time: req.body.time,

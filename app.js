@@ -14,7 +14,8 @@ const auth = require("./routes/auth");
 const service = require("./routes/service")
 const servicetype = require("./routes/servicetype")
 const booking = require("./routes/booking")
-// const review = require("./routes/review")
+const review = require("./routes/review")
+// const user = require("./routes/user")
 
 // MONGOOSE CONNECTION
 mongoose
@@ -72,7 +73,8 @@ app.use("/auth", auth);
 app.use("/", service);
 app.use("/", servicetype);
 app.use("/", booking);
-// app.use("/", review);
+app.use("/", review);
+// app.use("/profile", user);
 
 // ERROR HANDLING
 // catch 404 and forward to error handler

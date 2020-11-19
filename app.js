@@ -74,7 +74,7 @@ app.use("/", service);
 app.use("/", servicetype);
 app.use("/", booking);
 // app.use("/", review);
-// app.use("/", user);
+// app.use("/profile", user);
 
 // ERROR HANDLING
 // catch 404 and forward to error handler

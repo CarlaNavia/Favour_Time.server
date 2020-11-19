@@ -37,7 +37,6 @@ router.post("/reviews/:bookingID", isLoggedIn(), (req, res, next) => {
     res.status(400).json({ message: "Specified id is not valid" });
     return;
   }
-
   Booking.findById(req.params.bookingID)
     .then((currentBooking) => {
       if (!currentBooking.clientBooking.equals(req.session.currentUser._id)) {

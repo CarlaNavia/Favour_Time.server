@@ -74,6 +74,8 @@ app.use("/", service);
 app.use("/", servicetype);
 app.use("/", booking);
 app.use("/", review);
+app.use('/api', require('./routes/file-upload'));
+
 
 // ERROR HANDLING
 // catch 404 and forward to error handler

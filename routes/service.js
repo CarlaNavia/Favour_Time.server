@@ -21,7 +21,7 @@ router.post("/newservice", isLoggedIn(), (req, res, next) => {
     bookings: [],
   })
     .then((newService) => {
-      ServiceType.findByIdAndUpdate(req.body.serviceTypeID, { $push: { services: newService._id }})
+      ServiceType.findByIdAndUpdate(req.body.serviceTypeID, { $push: { services: newService._id }} , {new: true})
         .then(() => {
           res.json(newService);
         })

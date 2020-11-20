@@ -80,7 +80,6 @@ router.post("/logout", isLoggedIn() , (req, res, next) => {
 });
 
 router.get("/private", isLoggedIn() , (req, res, next) => {
- 
   res
     .status(200) 
     .json({ message: "User is logged in" });

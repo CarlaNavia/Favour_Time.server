@@ -68,6 +68,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
 
+
 // ROUTER MIDDLEWARE
 app.use("/auth", auth);
 app.use("/", service);
@@ -75,6 +76,10 @@ app.use("/", servicetype);
 app.use("/", booking);
 app.use("/", review);
 // app.use("/profile", user);
+
+app.use((req, res) => {
+  res.sendFile(__dirname + "/public/index.html");
+});
 
 // ERROR HANDLING
 // catch 404 and forward to error handler

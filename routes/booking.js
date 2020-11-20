@@ -71,7 +71,13 @@ router.post("/bookings/:serviceID", isLoggedIn(), (req, res, next) => {
         });
         return;
       }
-     
+     if(currentService.credits > req.session.currentUser.credits){
+        res.status(400).json({
+          message:
+            "You don't have enough credits to book this service.",
+        });
+        return;
+     }
       Booking.create({
         date: req.body.date,
         time: req.body.time,
@@ -131,12 +137,27 @@ router.put("/bookings/:ownerServiceID/:clientBooking/:bookingId/:status", isLogg
                 res.json(error)
               })
             })
+            .catch(error =>{
+              res.json(error)
+            })
+          })
+          .catch(error =>{
+            res.json(error)
           })
         }else{
           Booking.findByIdAndUpdate(req.params.bookingId ,{status: "declined"} , {new: true})
           .then(response =>{
-          res.json(response)
-          })
+            // console.log(response, 'response')
+            // Service.findByIdAndUpdate( req.params.bookingId, {$pull : {bookings: response.service}}, {new: true})
+            // console.log(req.params.bookingId,'reqqq')
+            // .then((responseService)=>{
+            //   console.log(responseService, 'responseService')
+              
+              res.json(response)
+            })
+            .catch(error =>{
+            res.json(error)
+            })
         }
     }) 
     .catch((err) => {
@@ -145,3 +166,8 @@ router.put("/bookings/:ownerServiceID/:clientBooking/:bookingId/:status", isLogg
 });
 
 module.exports = router;
+
+
+
+
+

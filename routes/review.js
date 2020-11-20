@@ -18,6 +18,13 @@ router.get("/reviews/:userID", isLoggedIn(), (req, res, next) => {
     res.status(400).json({ message: "Specified id is not valid" });
     return;
   }
+  if (req.session.currentUser._id !== req.params.userID) {
+    res.status(400).json({
+      message:
+        "You are not allowed to check these review.",
+    });
+    return;
+  }
   Review.find({ user: req.params.userID })
     .populate("booking")
     .populate("author")

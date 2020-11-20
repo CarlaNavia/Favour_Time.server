@@ -124,7 +124,4 @@ router.put("/profile/:userID", isLoggedIn(), (req, res, next) => {
 });
 
   
-  
-
-
 module.exports = router;

@@ -138,6 +138,7 @@ router.delete("/services/:id", isLoggedIn(), (req, res, next) => {
       return;
     }
     Service.findById(req.params.id)
+    
       .then((oneService) => {
         if (!oneService.owner.equals(req.session.currentUser._id)) {
           res
@@ -147,9 +148,19 @@ router.delete("/services/:id", isLoggedIn(), (req, res, next) => {
             });
           return;
         }
+
+        ServiceType.findByIdAndUpdate(oneService.serviceType , {$pull : {services : req.params.id}}, {new: true})
+          .then((responseServiceType) =>{
+            console.log(responseServiceType, 'responseServiceType')
+            
+          })
+  
         Service.findByIdAndRemove(req.params.id)
         .then(() => {
-            res.json({message: `Service with ${req.params.id} is deleted successfully.`});
+          console.log(oneService, 'oneService')
+          console.log(oneService.serviceType._id , 'oneService.serviceType._id')
+          console.log(req.params.id , 'req.params.id')
+          res.json({message: `Service with ${req.params.id} is deleted successfully.`});
           }
         );
       })

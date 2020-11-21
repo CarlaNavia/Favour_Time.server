@@ -1,8 +1,7 @@
 const mongoose = require('mongoose');
 const ServiceType = require('../models/serviceType');
 
-mongoose.connect(`mongodb://localhost/backend-server`, { useNewUrlParser: true, useUnifiedTopology: true } );
-
+mongoose.connect(`mongodb+srv://FavourTime:Time1234!@cluster0.t2bcc.mongodb.net/fvTime?retryWrites=true&w=majority`, { useNewUrlParser: true, useUnifiedTopology: true } );
 
 const serviceType = [
     {

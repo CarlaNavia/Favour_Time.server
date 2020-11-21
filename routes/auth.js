@@ -95,7 +95,7 @@ router.get("/profile", isLoggedIn() , (req, res, next) => {
 });
 
 
-// Editar informacion personal del user
+// Editar informacion personal del user / PROFILE 4
 router.put("/profile/:userID", isLoggedIn(), (req, res, next) => {
   if (!mongoose.Types.ObjectId.isValid(req.params.userID)) {
     res.status(400).json({ message: "Specified id is not valid" });

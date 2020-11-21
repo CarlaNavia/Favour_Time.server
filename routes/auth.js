@@ -86,13 +86,16 @@ router.get("/private", isLoggedIn() , (req, res, next) => {
 });
 
 router.get("/profile", isLoggedIn() , (req, res, next) => {
+  User.findById(req.session.currentUser._id)
+  .populate("review")
+  .then(user => {
+    res.json(user)
+  })
 
-  req.session.currentUser.password = "*";
-  res.json(req.session.currentUser);
 });
 
 
-// Editar informacion personal del user
+// Editar informacion personal del user / PROFILE 4
 router.put("/profile/:userID", isLoggedIn(), (req, res, next) => {
   if (!mongoose.Types.ObjectId.isValid(req.params.userID)) {
     res.status(400).json({ message: "Specified id is not valid" });

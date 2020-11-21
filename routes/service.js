@@ -106,7 +106,7 @@ router.get("/services/:serviceID", isLoggedIn(), (req, res, next) => {
     });
 });
 
-//Ruta GET de servicios para el owner
+//Ruta GET de servicios para el owner / PROFILE 5
 router.get("/servicesOwner/:userID", isLoggedIn(),(req, res, next) => {
   if (!mongoose.Types.ObjectId.isValid(req.params.userID)) {
     res.status(400).json({ message: "Specified id is not valid" });

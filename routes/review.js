@@ -12,7 +12,7 @@ const {
   validationLoggin,
 } = require("../helpers/middlewares");
 
-//Ruta GET de reviews (currentUser === ownerService) PROFILE 2
+//Ruta GET de reviews (currentUser === ownerService) PROFILE 3
 router.get("/reviews/:userID", isLoggedIn(), (req, res, next) => {
   if (!mongoose.Types.ObjectId.isValid(req.params.userID)) {
     res.status(400).json({ message: "Specified id is not valid" });

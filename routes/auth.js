@@ -86,9 +86,12 @@ router.get("/private", isLoggedIn() , (req, res, next) => {
 });
 
 router.get("/profile", isLoggedIn() , (req, res, next) => {
+  User.findById(req.session.currentUser._id)
+  .populate("review")
+  .then(user => {
+    res.json(user)
+  })
 
-  req.session.currentUser.password = "*";
-  res.json(req.session.currentUser);
 });
 
 

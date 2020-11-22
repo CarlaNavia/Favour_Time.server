@@ -60,6 +60,9 @@ router.post("/bookings/:serviceID", isLoggedIn(), (req, res, next) => {
     res.status(400).json({ message: "Specified id is not valid" });
     return;
   }
+
+
+
   Service.findById(req.params.serviceID)
     .then((currentService) => {
       if (currentService.owner.equals(req.session.currentUser._id)) {
@@ -75,6 +78,7 @@ router.post("/bookings/:serviceID", isLoggedIn(), (req, res, next) => {
         });
         return;
       }
+
       Booking.create({
         date: req.body.date,
         time: req.body.time,

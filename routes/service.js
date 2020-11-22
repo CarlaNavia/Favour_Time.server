@@ -98,6 +98,7 @@ router.get("/services/:serviceID", isLoggedIn(), (req, res, next) => {
   }
   Service.findById(req.params.serviceID)
     .populate("servicesType")
+    .populate("owner")
     .then((serviceDetails) => {
       res.status(200).json(serviceDetails);
     })

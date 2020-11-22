@@ -3,14 +3,14 @@ const cloudinaryStorage = require('multer-storage-cloudinary');
 const multer = require('multer');
 
 cloudinary.config({
-  cloud_name: process.env.cloudName,
-  api_key: process.env.cloudKey,
-  api_secret: process.env.cloudSecret
+  cloud_name: process.env.CLOUDINARY_NAME,
+  api_key: process.env.CLOUDINARY_KEY,
+  api_secret: process.env.CLOUDINARY_SECRET
 });
 
 var storage = cloudinaryStorage({
   cloudinary,
-  folder: 'movie-gallery', // The name of the folder in cloudinary
+  folder: 'photo-gallery', // The name of the folder in cloudinary
   allowedFormats: ['jpg', 'png'],
   // params: { resource_type: 'raw' }, => this is in case you want to upload other type of files, not just images
   filename: function (req, res, cb) {

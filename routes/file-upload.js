@@ -1,20 +1,37 @@
 const express = require("express");
 const router = express.Router();
+const User = require("../models/User");
+
+const {
+  isLoggedIn,
+  isNotLoggedIn,
+  validationLoggin,
+} = require("../helpers/middlewares");
 
 // include CLOUDINARY:
 const uploader = require("../configs/cloudinary-setup");
 
-router.post("/upload", uploader.single("imageUrl"), (req, res, next) => {
-  // console.log('file is: ', req.file)
+router.post(
+  "/upload",
+  uploader.single("file"),
+  isLoggedIn(),
+  async (req, res, next) => {
+    // console.log('file is: ', req.file)
 
-  if (!req.file) {
-    next(new Error("No file uploaded!"));
-    return;
+    if (!req.file) {
+      next(new Error("No file uploaded!"));
+      return;
+    }
+    const updatedUser = await User.findByIdAndUpdate(
+      req.session.currentUser._id,
+      { imageProfile: req.file.secure_url },
+      { new: true }
+      
+    );
+    // get secure_url from the file object and save it in the
+    // variable 'secure_url', but this can be any name, just make sure you remember to use the same in frontend
+    res.json(updatedUser);
   }
-  
-  // get secure_url from the file object and save it in the
-  // variable 'secure_url', but this can be any name, just make sure you remember to use the same in frontend
-  res.json({ secure_url: req.file.secure_url });
-});
+);
 
 module.exports = router;

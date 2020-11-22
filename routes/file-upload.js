@@ -8,7 +8,6 @@ const {
   validationLoggin,
 } = require("../helpers/middlewares");
 
-// include CLOUDINARY:
 const uploader = require("../configs/cloudinary-setup");
 
 router.post(

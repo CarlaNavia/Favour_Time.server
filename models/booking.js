@@ -2,9 +2,9 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const bookingSchema = new Schema({
-    date: { type: String, required: true},
+    date: { type: Date, required: true},
     time: { type: String, required: true},
-    extraInformation: { type: String},
+    extraInformation: { type: String },
     clientBooking: { type: Schema.Types.ObjectId, ref: "User" },
     ownerService: { type: Schema.Types.ObjectId, ref: "User" },
     service: { type: Schema.Types.ObjectId, ref: "Service" },

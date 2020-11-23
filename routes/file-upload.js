@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const User = require("../models/User");
 const Service = require("../models/Service");
+const mongoose = require('mongoose');
 
 const {
   isLoggedIn,
@@ -33,28 +34,26 @@ router.post(
 );
 
 router.post(
-  "/uploadservice",
+  "/uploadservice/:serviceId",
   uploader.single("file"),
   isLoggedIn(),
   async (req, res, next) => {
-
-
     if (!req.file) {
       next(new Error("No file uploaded!"));
       return;
     }
+    if (!mongoose.Types.ObjectId.isValid(req.params.serviceId)) {
+      res.status(400).json({ message: "Specified id is not valid" });
+      return;
+    }
     const servicesImage = await Service.findByIdAndUpdate(
-      req.session.currentUser._id,
-      { imageProfile: req.file.secure_url },
+      req.params.serviceId,
+      { imageService: req.file.secure_url },
       { new: true }
     );
 
-    res.json(updatedUser);
+    res.json(servicesImage);
   }
 );
-
-
-
-
 
 module.exports = router;

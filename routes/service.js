@@ -15,7 +15,9 @@ router.post("/newservice", isLoggedIn(), (req, res, next) => {
     description: req.body.description,
     serviceType: req.body.serviceTypeID,
     availableTime: req.body.availableTime,
+    cityToBeHeld: req.body.cityToBeHeld,
     addressToBeHeld: req.body.addressToBeHeld,
+    streetNumberToBeHeld: req.body.streetNumberToBeHeld,
     credits: req.body.credits,
     owner: req.session.currentUser._id,
     bookings: [],
@@ -97,7 +99,7 @@ router.get("/services/:serviceID", isLoggedIn(), (req, res, next) => {
     return;
   }
   Service.findById(req.params.serviceID)
-    .populate("servicesType")
+    .populate("serviceType")
     .populate("owner")
     .then((serviceDetails) => {
       res.status(200).json(serviceDetails);
@@ -139,7 +141,6 @@ router.delete("/services/:id", isLoggedIn(), (req, res, next) => {
       return;
     }
     Service.findById(req.params.id)
-    
       .then((oneService) => {
         if (!oneService.owner.equals(req.session.currentUser._id)) {
           res
@@ -153,7 +154,6 @@ router.delete("/services/:id", isLoggedIn(), (req, res, next) => {
         ServiceType.findByIdAndUpdate(oneService.serviceType , {$pull : {services : req.params.id}}, {new: true})
           .then((responseServiceType) =>{
             console.log(responseServiceType, 'responseServiceType')
-            
           })
   
         Service.findByIdAndRemove(req.params.id)

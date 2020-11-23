@@ -4,6 +4,7 @@ const router = express.Router();
 
 const ServiceType = require("../models/ServiceType");
 const Service = require("../models/Service");
+const Booking = require("../models/Booking");
 
 const { isLoggedIn } = require("../helpers/middlewares");
 
@@ -21,7 +22,11 @@ router.post("/newservice", isLoggedIn(), (req, res, next) => {
     bookings: [],
   })
     .then((newService) => {
-      ServiceType.findByIdAndUpdate(req.body.serviceTypeID, { $push: { services: newService._id }} , {new: true})
+      ServiceType.findByIdAndUpdate(
+        req.body.serviceTypeID,
+        { $push: { services: newService._id } },
+        { new: true }
+      )
         .then(() => {
           res.json(newService);
         })
@@ -70,15 +75,12 @@ router.put("/services/:id", isLoggedIn(), (req, res, next) => {
   Service.findById(req.params.id)
     .then((oneService) => {
       if (!oneService.owner.equals(req.session.currentUser._id)) {
-        res
-          .status(400)
-          .json({
-            message: "You are not the owner, you cannot edit the service",
-          });
+        res.status(400).json({
+          message: "You are not the owner, you cannot edit the service",
+        });
         return;
       }
-      Service.findByIdAndUpdate(req.params.id, req.body, { new: true })
-      .then(
+      Service.findByIdAndUpdate(req.params.id, req.body, { new: true }).then(
         (theService) => {
           res.json(theService);
         }
@@ -89,7 +91,6 @@ router.put("/services/:id", isLoggedIn(), (req, res, next) => {
     });
 });
 
-
 //Ruta detalle del servicio
 router.get("/services/:serviceID", isLoggedIn(), (req, res, next) => {
   if (!mongoose.Types.ObjectId.isValid(req.params.serviceID)) {
@@ -97,7 +98,7 @@ router.get("/services/:serviceID", isLoggedIn(), (req, res, next) => {
     return;
   }
   Service.findById(req.params.serviceID)
-    .populate("servicesType")
+    .populate("serviceType")
     .populate("owner")
     .then((serviceDetails) => {
       res.status(200).json(serviceDetails);
@@ -108,15 +109,14 @@ router.get("/services/:serviceID", isLoggedIn(), (req, res, next) => {
 });
 
 //Ruta GET de servicios para el owner / PROFILE 5
-router.get("/servicesOwner/:userID", isLoggedIn(),(req, res, next) => {
+router.get("/servicesOwner/:userID", isLoggedIn(), (req, res, next) => {
   if (!mongoose.Types.ObjectId.isValid(req.params.userID)) {
     res.status(400).json({ message: "Specified id is not valid" });
     return;
   }
   if (req.session.currentUser._id !== req.params.userID) {
     res.status(400).json({
-      message:
-        "You are not allowed due to you are the owner of the service.",
+      message: "You are not allowed due to you are the owner of the service.",
     });
     return;
   }
@@ -134,40 +134,37 @@ router.get("/servicesOwner/:userID", isLoggedIn(),(req, res, next) => {
 
 //Ruta eliminar servicio
 router.delete("/services/:id", isLoggedIn(), (req, res, next) => {
-    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
-      res.status(400).json({ message: "Specified id is not valid" });
-      return;
-    }
-    Service.findById(req.params.id)
-    
-      .then((oneService) => {
-        if (!oneService.owner.equals(req.session.currentUser._id)) {
-          res
-            .status(400)
-            .json({
-              message: "You are not the owner, you cannot delete the service",
+  if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+    res.status(400).json({ message: "Specified id is not valid" });
+    return;
+  }
+  Service.findById(req.params.id)
+    .then((oneService) => {
+      if (!oneService.owner.equals(req.session.currentUser._id)) {
+        res.status(400).json({
+          message: "You are not the owner, you cannot delete the service",
+        });
+        return;
+      }
+      ServiceType.findByIdAndUpdate(
+        oneService.serviceType,
+        { $pull: { services: req.params.id } },
+        { new: true }
+      ).then((responseServiceType) => {
+        Booking.deleteMany({
+          service: req.params.id,
+        }).then((responseBookings) => {
+          Service.findByIdAndRemove(req.params.id).then(() => {
+            res.json({
+              message: `Service with ${req.params.id} is deleted successfully.`,
             });
-          return;
-        }
-
-        ServiceType.findByIdAndUpdate(oneService.serviceType , {$pull : {services : req.params.id}}, {new: true})
-          .then((responseServiceType) =>{
-            console.log(responseServiceType, 'responseServiceType')
-            
-          })
-  
-        Service.findByIdAndRemove(req.params.id)
-        .then(() => {
-          console.log(oneService, 'oneService')
-          console.log(oneService.serviceType._id , 'oneService.serviceType._id')
-          console.log(req.params.id , 'req.params.id')
-          res.json({message: `Service with ${req.params.id} is deleted successfully.`});
-          }
-        );
-      })
-      .catch((err) => {
-        res.json(err);
+          });
+        });
       });
-  });
+    })
+    .catch((err) => {
+      res.json(err);
+    });
+});
 
 module.exports = router;

@@ -20,8 +20,7 @@ router.get("/reviews/:userID", isLoggedIn(), (req, res, next) => {
   }
   if (req.session.currentUser._id !== req.params.userID) {
     res.status(400).json({
-      message:
-        "You are not allowed to check these review.",
+      message: "You are not allowed to check these review.",
     });
     return;
   }
@@ -67,7 +66,13 @@ router.post("/reviews/:bookingID", isLoggedIn(), (req, res, next) => {
               $push: { review: newReview._id },
             })
               .then(() => {
-                res.json(newReview);
+                Booking.findByIdAndUpdate(
+                  req.params.bookingID,
+                  { review: newReview._id },
+                  { new: true }
+                ).then(() => {
+                  res.json(newReview);
+                });
               })
               .catch((err) => {
                 res.json(err);
@@ -78,9 +83,9 @@ router.post("/reviews/:bookingID", isLoggedIn(), (req, res, next) => {
           });
       } else {
         res.status(400).json({
-            message:
-              "You cannot write a review until your booking will be accepted.",
-          });
+          message:
+            "You cannot write a review until your booking will be accepted.",
+        });
       }
     })
     .catch((err) => {

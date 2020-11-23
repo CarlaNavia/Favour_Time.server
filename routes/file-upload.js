@@ -15,8 +15,6 @@ router.post(
   uploader.single("file"),
   isLoggedIn(),
   async (req, res, next) => {
-    // console.log('file is: ', req.file)
-
     if (!req.file) {
       next(new Error("No file uploaded!"));
       return;

@@ -54,6 +54,22 @@ router.get("/ownerservice/:userID", isLoggedIn(), (req, res, next) => {
       res.json(err);
     });
 });
+
+//Ruta GET para tener una booking
+router.get("/booking/:bookingId", isLoggedIn(), async (req, res, next) => {
+  if (!mongoose.Types.ObjectId.isValid(req.params.bookingId)) {
+    res.status(400).json({ message: "Specified id is not valid" });
+    return;
+  }
+  try {
+    const thisBooking = await Booking.findById(req.params.bookingId)
+    .populate("ownerService")
+    .populate("service")
+    res.json(thisBooking);
+  } catch (err) {
+    res.status(400).json(err);
+  }
+});
 //Ruta por POST para reservar un servicio
 router.post("/bookings/:serviceID", isLoggedIn(), (req, res, next) => {
   if (!mongoose.Types.ObjectId.isValid(req.params.serviceID)) {

@@ -4,7 +4,7 @@ const router = express.Router();
 
 const Booking = require("../models/booking");
 const Service = require("../models/Service");
-const User = require("../models/user");
+const User = require("../models/User");
 
 const { isLoggedIn } = require("../helpers/middlewares");
 

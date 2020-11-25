@@ -3,7 +3,7 @@ const mongoose = require("mongoose");
 const router = express.Router();
 const Booking = require("../models/booking");
 const Review = require("../models/review");
-const User = require("../models/user");
+const User = require("../models/User");
 
 // HELPER FUNCTIONS
 const {

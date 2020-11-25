@@ -50,7 +50,7 @@ router.post(
   async (req, res, next) => {
     const { email, password } = req.body;
     try {
-      const user = await User.findOne({ email });
+      const user = await User.findOne({ email }).populate("review");
 
       if (!user) {
         next(createError(404));
@@ -120,7 +120,7 @@ router.post("/buy", isLoggedIn(), (req, res, next) => {
     { new: true }
   ).then((updatedUser) => {
     res.json(updatedUser);
-  })
+  });
 });
 
 module.exports = router;

@@ -7,7 +7,7 @@ const userSchema = new Schema({
     credits: { type: Number, default: 30 },
     email: { type: String, required: true},
     password: { type: String, required: true},
-    imageProfile: { type: String, default: "..." },
+    imageProfile: { type: String },
     review: [{ type: Schema.Types.ObjectId, ref: "Review" }],
     dateOfBirth: {type: Date ,  default: "2000/01/01"},
     phoneNumber: {type: Number, default: 0},

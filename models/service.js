@@ -3,11 +3,13 @@ const Schema = mongoose.Schema;
 
 const serviceSchema = new Schema({
     serviceName: { type: String, required: true},
-    imageService: { type: String , default: "FOTO" },
+    imageService: { type: String },
     description: { type: String, required: true },
     serviceType: { type: Schema.Types.ObjectId, ref: 'ServiceType' },
     availableTime: { type: String },
+    cityToBeHeld: { type: String, required: true  },
     addressToBeHeld: { type: String, required: true  },
+    streetNumberToBeHeld: { type: String, required: true  },
     credits: { type: Number, required: true },
     owner: { type: Schema.Types.ObjectId, ref: 'User' },
     bookings:[{ type: Schema.Types.ObjectId, ref: 'Booking' }],

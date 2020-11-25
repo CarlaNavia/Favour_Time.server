@@ -2,8 +2,8 @@ const express = require("express");
 const mongoose = require("mongoose");
 const router = express.Router();
 
-const ServiceType = require("../models/ServiceType");
-const Service = require("../models/Service");
+const ServiceType = require("../models/serviceType");
+const Service = require("../models/service");
 const Booking = require("../models/booking");
 
 const { isLoggedIn } = require("../helpers/middlewares");

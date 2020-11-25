@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const ServiceType = require('../models/ServiceType');
+const ServiceType = require('../models/serviceType');
 
 mongoose.connect(`mongodb+srv://FavourTime:Time1234!@cluster0.t2bcc.mongodb.net/fvTime?retryWrites=true&w=majority`, { useNewUrlParser: true, useUnifiedTopology: true } );
 

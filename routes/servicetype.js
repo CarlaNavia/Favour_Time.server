@@ -2,7 +2,7 @@ const express = require("express");
 const mongoose = require("mongoose");
 const router = express.Router();
 
-const ServiceType = require("../models/ServiceType");
+const ServiceType = require("../models/serviceType");
 
 router.get("/servicetype", (req, res, next) => {
   ServiceType.find()

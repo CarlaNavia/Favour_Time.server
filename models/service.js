@@ -3,7 +3,7 @@ const Schema = mongoose.Schema;
 
 const serviceSchema = new Schema({
     serviceName: { type: String, required: true},
-    imageService: { type: String },
+    imageService: { type: String, required: true},
     description: { type: String, required: true },
     serviceType: { type: Schema.Types.ObjectId, ref: 'ServiceType' },
     availableTime: { type: String },

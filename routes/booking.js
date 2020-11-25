@@ -3,7 +3,7 @@ const mongoose = require("mongoose");
 const router = express.Router();
 
 const Booking = require("../models/booking");
-const Service = require("../models/service");
+const Service = require("../models/Service");
 const User = require("../models/user");
 
 const { isLoggedIn } = require("../helpers/middlewares");

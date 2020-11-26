@@ -92,7 +92,7 @@ router.put("/profile/:userID", isLoggedIn(), (req, res, next) => {
     res.status(400).json({ message: "Specified id is not valid" });
     return;
   }
-  console.log(req.params.userID, "params");
+
   User.findById(req.params.userID)
     .then((user) => {
       if (!user._id.equals(req.session.currentUser._id)) {
@@ -103,7 +103,7 @@ router.put("/profile/:userID", isLoggedIn(), (req, res, next) => {
       }
       User.findByIdAndUpdate(req.params.userID, req.body, { new: true }).then(
         (userUpdated) => {
-          console.log(userUpdated, "userUpdated");
+      
           res.json(userUpdated);
         }
       );
